@@ -11,10 +11,10 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { useQuery } from "react-query"
 
-import { type ApiError, ItemsService } from "../../client"
+import { ItemsService } from "../../client"
 import ActionsMenu from "../../components/Common/ActionsMenu"
 import Navbar from "../../components/Common/Navbar"
 import useCustomToast from "../../hooks/useCustomToast"
@@ -30,10 +30,13 @@ function Items() {
     isLoading,
     isError,
     error,
-  } = useQuery("items", () => ItemsService.readItems({}))
+  } = useQuery({
+    queryKey: ["items"],
+    queryFn: () => ItemsService.readItems({}),
+  })
 
   if (isError) {
-    const errDetail = (error as ApiError).body?.detail
+    const errDetail = (error as any).body?.detail
     showToast("Something went wrong.", `${errDetail}`, "error")
   }
 
@@ -70,7 +73,7 @@ function Items() {
                     <Tr key={item.id}>
                       <Td>{item.id}</Td>
                       <Td>{item.title}</Td>
-                      <Td color={!item.description ? "gray.400" : "inherit"}>
+                      <Td color={!item.description ? "ui.dim" : "inherit"}>
                         {item.description || "N/A"}
                       </Td>
                       <Td>
@@ -87,5 +90,3 @@ function Items() {
     </>
   )
 }
-
-export default Items
